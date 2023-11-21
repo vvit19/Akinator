@@ -1,0 +1,37 @@
+
+            digraph g {
+            rankdir   =  TB;
+            graph[ranksep = 1.3, nodesep = 0.5, style = "rounded, filled"]
+            Node0x558440d732a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хайповая игра"] 
+ 
+Node0x558440d73700[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Соулс лайк"] 
+ 
+Node0x558440d73840[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Есть гринд"] 
+ 
+Node0x558440d73980[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Очень большая"] 
+ 
+Node0x558440d73ac0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Элден ринг"] 
+ 
+Node0x558440d73a20[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Бладборн"] 
+ 
+Node0x558440d738e0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Дарк соулс"] 
+ 
+Node0x558440d737a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ведьмак"] 
+ 
+Node0x558440d73520[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Дохуя гринда"] 
+ 
+Node0x558440d73660[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ассасин крид"] 
+ 
+Node0x558440d735c0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хз"] 
+ 
+Node0x558440d732a0->Node0x558440d73700
+Node0x558440d73700->Node0x558440d73840
+Node0x558440d73840->Node0x558440d73980
+Node0x558440d73980->Node0x558440d73ac0
+Node0x558440d73980->Node0x558440d73a20
+Node0x558440d73840->Node0x558440d738e0
+Node0x558440d73700->Node0x558440d737a0
+Node0x558440d732a0->Node0x558440d73520
+Node0x558440d73520->Node0x558440d73660
+Node0x558440d73520->Node0x558440d735c0
+}

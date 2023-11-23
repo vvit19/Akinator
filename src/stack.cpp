@@ -9,7 +9,7 @@ static void stack_recalloc_up(stack* stk);
 static void stack_recalloc_down(stack* stk);
 static void fill_garbage(stack* stk, long long new_size, long long old_size);
 
-stack_errors stack_ctor(stack* stk ON_DEBUG(, function_info info))
+stack_errors StackCtor(stack* stk ON_DEBUG(, function_info info))
 {
     assert(stk);
 

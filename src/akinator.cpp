@@ -10,7 +10,7 @@ static char*  GetTree        (Node* node, char* buffer);
 static void   Guess          (Node* node);
 static Node*  GetObject      (Node* node, const char* name);
 static void   GetSentence    (char* name);
-static void   FindWay        (Node* node, stack* stk);
+static void   FindPath        (Node* node, stack* stk);
 static void   TellAbout      (Node* node, stack* stk);
 static void   DescribeObject (Node* main_node, const char* name);
 static void   CompareObjects (Node* main_node, const char* name_1, const char* name_2);
@@ -18,9 +18,17 @@ static void   CompareObjects (Node* main_node, const char* name_1, const char* n
 const int MAX_NAME_LENGTH = 100;
 const int ANSWER_LENGTH   = 7;
 
-int main (int /*argc*/, const char** argv)
+int main (int argc, const char** argv)
 {
+    if (argc != 2)
+    {
+        printf ("Некорректный ввод аргументов командной строки\n");
+        return 1;
+    }
+
     StartGame (argv[1]);
+
+    return 0;
 }
 
 Node* CreateNode (Node* parent, Way mode)
@@ -107,7 +115,7 @@ static void StartGame (const char* base)
         printf ("Неверный ввод режима\n");
     }
 
-    TreeDump  (main_node);
+    TreeDump (main_node);
 
     FILE* file = fopen (base, "w");
     PrintTree (main_node, file);
@@ -179,7 +187,7 @@ static void Guess (Node* node)
             strcpy (node->right->name, node->name);
 
             printf ("А чем %s отличается от %s?\n"
-                    "Он (а/o) ", node->left->name, node->right->name);
+                    "Он(а/o) ", node->left->name, node->right->name);
             GetSentence (node->name);
         }
 
@@ -208,15 +216,26 @@ static void CompareObjects (Node* main_node, const char* name_1, const char* nam
     assert (name_2);
 
     Node* object_1 = GetObject (main_node, name_1);
+    if (!object_1)
+    {
+        printf ("Первого объекта в базе нет!\n");
+        return;
+    }
+
     Node* object_2 = GetObject (main_node, name_2);
+    if (!object_2)
+    {
+        printf ("Второго объекта в базе нет!\n");
+        return;
+    }
 
     stack stk_1 = {};
     stack_ctor (&stk_1);
-    FindWay (object_1, &stk_1);
+    FindPath (object_1, &stk_1);
 
     stack stk_2 = {};
     stack_ctor (&stk_2);
-    FindWay (object_2, &stk_2);
+    FindPath (object_2, &stk_2);
 
     Node* node = main_node;
     Way way_1 = LEFT;
@@ -277,34 +296,39 @@ static void DescribeObject (Node* main_node, const char* name)
     assert (main_node);
 
     Node* object = GetObject (main_node, name);
+    if (!object)
+    {
+        printf ("Такого объекта в базе нет!\n");
+        return;
+    }
 
     stack stk = {};
     stack_ctor (&stk);
 
-    FindWay (object, &stk);
+    FindPath (object, &stk);
     TellAbout (main_node, &stk);
     putchar ('\n');
 
     stack_dtor (&stk);
 }
 
-static void FindWay (Node* node, stack* stk)
+static void FindPath (Node* node, stack* stk)
 {
     assert (stk);
 
-    if (node->parent == nullptr) return;
+    if (node->parent == nullptr) { return; }
 
     Node* parent = node->parent;
 
     if (node == parent->left)
     {
         stack_push (stk, LEFT);
-        FindWay (parent, stk);
+        FindPath (parent, stk);
     }
     else
     {
         stack_push (stk, RIGHT);
-        FindWay (parent, stk);
+        FindPath (parent, stk);
     }
 }
 

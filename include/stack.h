@@ -88,8 +88,8 @@ struct stack
     #define ON_DEBUG(...)
 #endif
 
-stack_errors stack_ctor(stack* stk ON_DEBUG(, function_info func_info));
-#define STACK_CTOR(stk) stack_ctor(stk ON_DEBUG(, {#stk, __PRETTY_FUNCTION__, __FILE__, __LINE__} ))
+stack_errors StackCtor(stack* stk ON_DEBUG(, function_info func_info));
+#define StackCtor(stk) StackCtor(stk ON_DEBUG(, {#stk, __PRETTY_FUNCTION__, __FILE__, __LINE__} ))
 
 stack_errors stack_push (stack* stk, elem_t value);
 stack_errors stack_pop(stack* stk, elem_t* popped_value);

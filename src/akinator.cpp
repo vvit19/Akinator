@@ -10,19 +10,45 @@ static char*  GetTree        (Node* node, char* buffer);
 static void   Guess          (Node* node);
 static Node*  GetObject      (Node* node, const char* name);
 static void   GetSentence    (char* name);
-static void   FindPath        (Node* node, stack* stk);
+static void   FindPath       (Node* node, stack* stk);
 static void   TellAbout      (Node* node, stack* stk);
 static void   DescribeObject (Node* main_node, const char* name);
 static void   CompareObjects (Node* main_node, const char* name_1, const char* name_2);
+static void   PrintAndTell   (const char string[]);
 
-const int MAX_NAME_LENGTH = 100;
-const int ANSWER_LENGTH   = 7;
+#define SPEAK
+
+#ifdef SPEAK
+    #define PRINT_AND_TELL(...) { \
+        char spoken_text[MAX_SPEAK_LENGTH] = ""; \
+        sprintf (spoken_text, __VA_ARGS__); \
+        PrintAndTell (spoken_text); }
+#else
+    #define PRINT_AND_TELL(...) printf (__VA_ARGS__);
+#endif
+
+const int MAX_SPEAK_LENGTH  = 1024;
+const int MAX_NAME_LENGTH   = 100;
+const int MAX_ANSWER_LENGTH = 7;
+
+static void PrintAndTell (const char string[])
+{
+    assert (string);
+
+    printf ("%s", string);
+
+    #ifdef SPEAK
+        char spoken_text[MAX_SPEAK_LENGTH] = "";
+        sprintf (spoken_text, "echo \"%s\" | festival --tts --language russian", string);
+        system (spoken_text);
+    #endif
+}
 
 int main (int argc, const char** argv)
 {
     if (argc != 2)
     {
-        printf ("Некорректный ввод аргументов командной строки\n");
+        PrintAndTell ("Некорректный ввод аргументов командной строки\n");
         return 1;
     }
 
@@ -74,11 +100,11 @@ static void StartGame (const char* base)
 
     GetTree (main_node, buffer + 1);
 
-    printf ("Акинатор начинает разносить\n"
-            "Выбери режим: \n"
-            "1) o - отгадывание \n"
-            "2) р - расскажу о предмете из базы \n"
-            "3) с - сравню 2 предмета из базы \n");
+    PrintAndTell ("Акинатор начинает разносить\n"
+                  "Выбери режим: \n"
+                  "1) o - отгадывание \n"
+                  "2) р - расскажу о предмете из базы \n"
+                  "3) с - сравню 2 предмета из базы \n");
 
     char ch[3] = "";
     scanf ("%s", ch);
@@ -86,12 +112,12 @@ static void StartGame (const char* base)
 
     if (strcmp (ch, "о") == 0)
     {
-        printf ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
+        PrintAndTell ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
         Guess (main_node);
     }
     else if (strcmp (ch, "р") == 0)
     {
-        printf ("Введите название предмета: ");
+        PrintAndTell ("Введите название предмета: ");
         char name[MAX_NAME_LENGTH] = "";
         GetSentence (name);
 
@@ -99,20 +125,20 @@ static void StartGame (const char* base)
     }
     else if (strcmp (ch, "с") == 0)
     {
-        printf ("Введите название первого предмета: ");
+        PrintAndTell ("Введите название первого предмета: ");
         char name_1[MAX_NAME_LENGTH] = "";
         GetSentence (name_1);
 
-        printf ("Введите название второго предмета: ");
+        PrintAndTell ("Введите название второго предмета: ");
         char name_2[MAX_NAME_LENGTH] = "";
         GetSentence (name_2);
 
-        if (strcmp (name_1, name_2) == 0) printf ("Они одинаковые\n");
+        if (strcmp (name_1, name_2) == 0) PrintAndTell ("Они одинаковые\n");
         else CompareObjects (main_node, name_1, name_2);
     }
     else
     {
-        printf ("Неверный ввод режима\n");
+        PrintAndTell ("Неверный ввод режима\n");
     }
 
     TreeDump (main_node);
@@ -167,34 +193,35 @@ static void Guess (Node* node)
 {
     assert (node);
 
-    char answer[ANSWER_LENGTH] = "";
+    char answer[MAX_ANSWER_LENGTH] = "";
 
     if (node->left == nullptr && node->right == nullptr)
     {
-        printf ("Я знаю ответ! Это %s?\n", node->name);
+        PRINT_AND_TELL("Я знаю ответ! Это %s?\n", node->name);
+
         scanf ("%s", answer);
-        if (strcmp (answer, "да") == 0) printf ("Ха я гений\n");
+        if (strcmp (answer, "да") == 0) PrintAndTell ("Ха я гений\n");
         else
         {
             CreateNode (node, RIGHT);
             CreateNode (node, LEFT);
 
-            printf ("И кто же это?\n"
-                    "Это ");
+            PrintAndTell ("И кто же это?\n"
+                          "Это ");
             ClearBuffer ();
             GetSentence (node->left->name);
 
             strcpy (node->right->name, node->name);
 
-            printf ("А чем %s отличается от %s?\n"
-                    "Он(а/o) ", node->left->name, node->right->name);
+            PRINT_AND_TELL("А чем %s отличается от %s?\n"
+                           "Он(а/o) ", node->left->name, node->right->name);
             GetSentence (node->name);
         }
 
         return;
     }
 
-    printf ("%s?\n", node->name);
+    PRINT_AND_TELL("%s?\n", node->name);
 
     scanf ("%s", answer);
     while (true)
@@ -203,7 +230,7 @@ static void Guess (Node* node)
         else if (strcmp (answer, "нет") == 0) { Guess (node->right); break; }
         else
         {
-            printf ("Некорректный ввод! Попробуйте еще\n");
+            PrintAndTell ("Некорректный ввод! Попробуйте еще\n");
             scanf ("%s", answer);
         }
     }
@@ -218,14 +245,14 @@ static void CompareObjects (Node* main_node, const char* name_1, const char* nam
     Node* object_1 = GetObject (main_node, name_1);
     if (!object_1)
     {
-        printf ("Первого объекта в базе нет!\n");
+        PrintAndTell ("Первого объекта в базе нет!\n");
         return;
     }
 
     Node* object_2 = GetObject (main_node, name_2);
     if (!object_2)
     {
-        printf ("Второго объекта в базе нет!\n");
+        PrintAndTell ("Второго объекта в базе нет!\n");
         return;
     }
 
@@ -250,13 +277,13 @@ static void CompareObjects (Node* main_node, const char* name_1, const char* nam
         {
             if (way_1 == LEFT)
             {
-                printf ("Про %s можно сказать %s, в то время как про %s так сказать нельзя\n",
-                        name_1, node->name, name_2);
+                PRINT_AND_TELL("Про %s можно сказать %s, в то время как про %s так сказать нельзя\n",
+                                name_1, node->name, name_2);
             }
             else
             {
-                printf ("Про %s можно сказать %s, в то время как про %s так сказать нельзя\n",
-                        name_2, node->name, name_1);
+                PRINT_AND_TELL("Про %s можно сказать %s, в то время как про %s так сказать нельзя\n",
+                                name_2, node->name, name_1);
             }
 
             stack_dtor (&stk_1);
@@ -298,7 +325,7 @@ static void DescribeObject (Node* main_node, const char* name)
     Node* object = GetObject (main_node, name);
     if (!object)
     {
-        printf ("Такого объекта в базе нет!\n");
+        PrintAndTell ("Такого объекта в базе нет!\n");
         return;
     }
 
@@ -339,18 +366,18 @@ static void TellAbout (Node* node, stack* stk)
 
     if (way == LEFT)
     {
-        printf ("%s", node->name);
+        PRINT_AND_TELL("%s", node->name);
         node = node->left;
     }
     else
     {
-        printf ("не %s", node->name);
+        PRINT_AND_TELL("не %s", node->name);
         node = node->right;
     }
 
     if (node->left && node->right)
     {
-        printf (", ");
+        printf (", \n");
         TellAbout (node, stk);
     }
 }

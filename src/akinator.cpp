@@ -18,10 +18,10 @@ static void   PrintAndSpeak   (const char string[]);
 
 #define SPEAK
 #ifdef SPEAK
-    #define PRINT_AND_SPEAK(...) { \
+    #define PRINT_AND_SPEAK(...) do { \
         char spoken_text[MAX_SPEAK_LENGTH] = ""; \
         sprintf (spoken_text, __VA_ARGS__); \
-        PrintAndSpeak (spoken_text); }
+        PrintAndSpeak (spoken_text); } while (0)
 #else
     #define PRINT_AND_SPEAK(...) printf (__VA_ARGS__);
 #endif
@@ -34,11 +34,21 @@ int main (int argc, const char** argv)
 {
     if (argc != 2)
     {
-        PrintAndSpeak ("Некорректный ввод аргументов командной строки\n");
+        PRINT_AND_SPEAK ("Некорректный ввод аргументов командной строки\n");
         return 1;
     }
 
-    StartGame (argv[1]);
+    char exit_mode[3] = "";
+    while (true)
+    {
+        StartGame (argv[1]);
+
+        PRINT_AND_SPEAK ("Если вы хотите продолжить - введите п, "
+                         "если вы хотите выйти - введите любую другую букву: \n");
+        scanf ("%s", exit_mode);
+
+        if (strcmp (exit_mode, "п") != 0) break;
+    }
 
     return 0;
 }
@@ -86,11 +96,11 @@ static void StartGame (const char* base)
 
     GetTree (main_node, buffer + 1);
 
-    PrintAndSpeak ("Акинатор начинает разносить\n"
-                   "Выбери режим: \n"
-                   "1) o - отгадывание \n"
-                   "2) р - расскажу о предмете из базы \n"
-                   "3) с - сравню 2 предмета из базы \n");
+    PRINT_AND_SPEAK ("Акинатор начинает разносить\n"
+                    "Выбери режим: \n"
+                    "1) o - отгадывание \n"
+                    "2) р - расскажу о предмете из базы \n"
+                    "3) с - сравню 2 предмета из базы \n");
 
     char ch[3] = "";
     scanf ("%s", ch);
@@ -98,12 +108,12 @@ static void StartGame (const char* base)
 
     if (strcmp (ch, "о") == 0)
     {
-        PrintAndSpeak ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
+        PRINT_AND_SPEAK ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
         LaunchGuessMode (main_node);
     }
     else if (strcmp (ch, "р") == 0)
     {
-        PrintAndSpeak ("Введите название предмета: ");
+        PRINT_AND_SPEAK ("Введите название предмета: ");
         char name[MAX_NAME_LENGTH] = "";
         GetSentence (name);
 
@@ -111,20 +121,20 @@ static void StartGame (const char* base)
     }
     else if (strcmp (ch, "с") == 0)
     {
-        PrintAndSpeak ("Введите название первого предмета: ");
+        PRINT_AND_SPEAK ("Введите название первого предмета: ");
         char name_1[MAX_NAME_LENGTH] = "";
         GetSentence (name_1);
 
-        PrintAndSpeak ("Введите название второго предмета: ");
+        PRINT_AND_SPEAK ("Введите название второго предмета: ");
         char name_2[MAX_NAME_LENGTH] = "";
         GetSentence (name_2);
 
-        if (strcmp (name_1, name_2) == 0) PrintAndSpeak ("Они одинаковые\n");
+        if (strcmp (name_1, name_2) == 0) PRINT_AND_SPEAK ("Они одинаковые\n");
         else CompareObjects (main_node, name_1, name_2);
     }
     else
     {
-        PrintAndSpeak ("Неверный ввод режима\n");
+        PRINT_AND_SPEAK ("Неверный ввод режима\n");
     }
 
     TreeDump (main_node);
@@ -183,24 +193,24 @@ static void LaunchGuessMode (Node* node)
 
     if (node->left == nullptr && node->right == nullptr)
     {
-        PRINT_AND_SPEAK("Я знаю ответ! Это %s?\n", node->name);
+        PRINT_AND_SPEAK ("Я знаю ответ! Это %s?\n", node->name);
 
         scanf ("%s", answer);
-        if (strcmp (answer, "да") == 0) PrintAndSpeak ("Ха я гений\n");
+        if (strcmp (answer, "да") == 0) PRINT_AND_SPEAK ("Ха я гений\n");
         else
         {
             CreateNode (node, RIGHT);
             CreateNode (node, LEFT);
 
-            PrintAndSpeak ("И кто же это?\n"
-                          "Это ");
+            PRINT_AND_SPEAK ("И кто же это?\n"
+                             "Это ");
             ClearBuffer ();
             GetSentence (node->left->name);
 
             strcpy (node->right->name, node->name);
 
-            PRINT_AND_SPEAK("А чем %s отличается от %s?\n"
-                           "Он(а/o) ", node->left->name, node->right->name);
+            PRINT_AND_SPEAK ("А чем %s отличается от %s?\n"
+                             "Он(а/o) ", node->left->name, node->right->name);
             GetSentence (node->name);
         }
 
@@ -216,7 +226,7 @@ static void LaunchGuessMode (Node* node)
         else if (strcmp (answer, "нет") == 0) { LaunchGuessMode (node->right); break; }
         else
         {
-            PrintAndSpeak ("Некорректный ввод! Попробуйте еще\n");
+            PRINT_AND_SPEAK ("Некорректный ввод! Попробуйте еще\n");
             scanf ("%s", answer);
         }
     }
@@ -231,14 +241,14 @@ static void CompareObjects (Node* main_node, const char* name_1, const char* nam
     Node* object_1 = GetObject (main_node, name_1);
     if (!object_1)
     {
-        PrintAndSpeak ("Первого объекта в базе нет!\n");
+        PRINT_AND_SPEAK ("Первого объекта в базе нет!\n");
         return;
     }
 
     Node* object_2 = GetObject (main_node, name_2);
     if (!object_2)
     {
-        PrintAndSpeak ("Второго объекта в базе нет!\n");
+        PRINT_AND_SPEAK ("Второго объекта в базе нет!\n");
         return;
     }
 
@@ -314,7 +324,7 @@ static void DescribeObject (Node* main_node, const char* name)
     Node* object = GetObject (main_node, name);
     if (!object)
     {
-        PrintAndSpeak ("Такого объекта в базе нет!\n");
+        PRINT_AND_SPEAK ("Такого объекта в базе нет!\n");
         return;
     }
 
@@ -355,12 +365,12 @@ static void TellAbout (Node* node, stack* stk)
 
     if (way == LEFT)
     {
-        PRINT_AND_SPEAK("%s", node->name);
+        PRINT_AND_SPEAK ("%s", node->name);
         node = node->left;
     }
     else
     {
-        PRINT_AND_SPEAK("не %s", node->name);
+        PRINT_AND_SPEAK ("не %s", node->name);
         node = node->right;
     }
 

@@ -5,16 +5,17 @@
 #include <cctype>
 #include <cstring>
 
-static void   StartGame       (const char* base);
-static char*  GetTree         (Node* node, char* buffer);
-static void   LaunchGuessMode (Node* node);
-static Node*  GetObject       (Node* node, const char* name);
-static void   GetSentence     (char* name);
-static void   FindPath        (Node* node, stack* stk);
-static void   TellAbout       (Node* node, stack* stk);
-static void   DescribeObject  (Node* main_node, const char* name);
-static void   CompareObjects  (Node* main_node, const char* name_1, const char* name_2);
-static void   PrintAndSpeak   (const char string[]);
+static void   StartGame        (const char* base);
+static char*  GetTree          (Node* node, char* buffer);
+static void   Guess            (Node* node);
+static Node*  GetObject        (Node* node, const char* name);
+static void   GetSentence      (char* name);
+static void   FindPath         (Node* node, stack* stk);
+static void   TellAbout        (Node* node, stack* stk);
+static void   DescribeObject   (Node* main_node, const char* name);
+static void   CompareObjects   (Node* main_node, const char* name_1, const char* name_2);
+static void   PrintAndSpeak    (const char string[]);
+static void   AddNodeToBase    (Node* node);
 
 #define SPEAK
 #ifdef SPEAK
@@ -101,7 +102,7 @@ static void StartGame (const char* base)
                     "1) o - отгадывание \n"
                     "2) р - расскажу о предмете из базы \n"
                     "3) с - сравню 2 предмета из базы \n"
-                    "4) п - показать базу \n");
+                    "4) п - выдать базу \n");
 
     char mode[3] = "";
     scanf ("%s", mode);
@@ -110,7 +111,7 @@ static void StartGame (const char* base)
     if (strcmp (mode, "о") == 0)
     {
         PRINT_AND_SPEAK ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
-        LaunchGuessMode (main_node);
+        Guess (main_node);
     }
     else if (strcmp (mode, "р") == 0)
     {
@@ -164,8 +165,7 @@ static char* GetTree (Node* node, char* buffer)
 
     if (*buffer == '(') buffer++;
 
-    int i = 0;
-    for ( ; *buffer != ')' && *buffer != '\0'; buffer++)
+    for (int i = 0; *buffer != ')' && *buffer != '\0'; buffer++)
     {
         if (*buffer == '(')
         {
@@ -174,67 +174,62 @@ static char* GetTree (Node* node, char* buffer)
         }
         else
         {
-            if (*buffer == ' ')
-            {
-                if (! (i > 0 && !isspace (node->name[i - 1]))) continue;
-            }
-
             if (isspace (*buffer) && *buffer != ' ') continue;
-
             node->name[i++] = *buffer;
         }
     }
 
-    if (node->name[i - 1] == ' ') { node->name[i - 1] = '\0'; }
-
     return buffer;
 }
 
-static void LaunchGuessMode (Node* node)
+static void Guess (Node* node)
 {
     assert (node);
 
     char answer[MAX_ANSWER_LENGTH] = "";
 
-    if (node->left == nullptr && node->right == nullptr)
+    while (! (node->left == nullptr && node->right == nullptr))
     {
-        PRINT_AND_SPEAK ("Я знаю ответ! Это %s?\n", node->name);
-
+        PRINT_AND_SPEAK("%s?\n", node->name);
         scanf ("%s", answer);
-        if (strcmp (answer, "да") == 0) PRINT_AND_SPEAK ("Ха я гений\n");
-        else
-        {
-            CreateNode (node, RIGHT);
-            CreateNode (node, LEFT);
 
-            PRINT_AND_SPEAK ("И кто же это?\n"
-                             "Это ");
-            ClearBuffer ();
-            GetSentence (node->left->name);
-
-            strcpy (node->right->name, node->name);
-
-            PRINT_AND_SPEAK ("А чем %s отличается от %s?\n"
-                             "Он(а/o) ", node->left->name, node->right->name);
-            GetSentence (node->name);
-        }
-
-        return;
-    }
-
-    PRINT_AND_SPEAK("%s?\n", node->name);
-
-    scanf ("%s", answer);
-    while (true)
-    {
-        if (strcmp (answer, "да") == 0) { LaunchGuessMode (node->left); break; }
-        else if (strcmp (answer, "нет") == 0) { LaunchGuessMode (node->right); break; }
+        if (strcmp (answer, "да") == 0) node = node->left;
+        else if (strcmp (answer, "нет") == 0) node = node->right;
         else
         {
             PRINT_AND_SPEAK ("Некорректный ввод! Попробуйте еще\n");
             scanf ("%s", answer);
         }
     }
+
+    PRINT_AND_SPEAK ("Я знаю ответ! Это %s?\n", node->name);
+
+    scanf ("%s", answer);
+    if (strcmp (answer, "да") == 0) PRINT_AND_SPEAK ("Ха я гений\n");
+    else
+    {
+        AddNodeToBase (node);
+    }
+}
+
+static void AddNodeToBase (Node* node)
+{
+    assert (node);
+
+    CreateNode (node, RIGHT);
+    CreateNode (node, LEFT);
+
+    PRINT_AND_SPEAK ("И кто же это?\n"
+                     "Это ");
+    ClearBuffer ();
+    GetSentence (node->left->name);
+
+    strcpy (node->right->name, node->name);
+
+    PRINT_AND_SPEAK ("А чем %s отличается от %s?\n"
+                     "Он(а/o) ", node->left->name, node->right->name);
+
+    GetSentence (node->name);
 }
 
 static void CompareObjects (Node* main_node, const char* name_1, const char* name_2)
@@ -297,7 +292,6 @@ static void CompareObjects (Node* main_node, const char* name_1, const char* nam
 
         if (way_1 == LEFT) node = node->left;
         else node = node->right;
-
     }
 
     stack_dtor (&stk_1);
@@ -366,24 +360,29 @@ static void FindPath (Node* node, stack* stk)
 static void TellAbout (Node* node, stack* stk)
 {
     Way way = LEFT;
-    stack_pop (stk, (int*) &way);
 
-    if (way == LEFT)
+    while (node->left && node->right)
     {
-        PRINT_AND_SPEAK ("%s", node->name);
-        node = node->left;
-    }
-    else
-    {
-        PRINT_AND_SPEAK ("не %s", node->name);
-        node = node->right;
+        stack_pop (stk, (int*) &way);
+
+        if (way == LEFT)
+        {
+            PRINT_AND_SPEAK ("%s", node->name);
+            node = node->left;
+        }
+        else
+        {
+            PRINT_AND_SPEAK ("не %s", node->name);
+            node = node->right;
+        }
+
+        if (node->left && node->right)
+        {
+            printf (", \n");
+            TellAbout (node, stk);
+        }
     }
 
-    if (node->left && node->right)
-    {
-        printf (", \n");
-        TellAbout (node, stk);
-    }
 }
 
 static void PrintAndSpeak (const char string[])
@@ -391,12 +390,11 @@ static void PrintAndSpeak (const char string[])
     assert (string);
 
     printf ("%s", string);
+    ClearBuffer ();
 
-    #ifdef SPEAK
-        char spoken_text[MAX_SPEAK_LENGTH] = "";
-        sprintf (spoken_text, "echo \"%s\" | festival --tts --language russian", string);
-        system (spoken_text);
-    #endif
+    char spoken_text[MAX_SPEAK_LENGTH] = "";
+    sprintf (spoken_text, "echo \"%s\" | festival --tts --language russian", string);
+    system (spoken_text);
 }
 
 static void GetSentence (char* name)

@@ -2,36 +2,42 @@
             digraph g {
             rankdir   =  TB;
             graph[ranksep = 1.3, nodesep = 0.5, style = "rounded, filled"]
-            Node0x564dcf6ab2a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хайповая игра"] 
+            Node0x561058d442a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хайповая игра"] 
  
-Node0x564dcf6ab700[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Соулс лайк"] 
+Node0x561058d44700[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Соулс лайк"] 
  
-Node0x564dcf6ab840[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Есть гринд"] 
+Node0x561058d44840[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Есть гринд"] 
  
-Node0x564dcf6ab980[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Очень большая"] 
+Node0x561058d44980[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Очень большая"] 
  
-Node0x564dcf6abac0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Элден ринг"] 
+Node0x561058d44ac0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Элден ринг"] 
  
-Node0x564dcf6aba20[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Бладборн"] 
+Node0x561058d44a20[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Бладборн"] 
  
-Node0x564dcf6ab8e0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Дарк соулс"] 
+Node0x561058d448e0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Дарк соулс"] 
  
-Node0x564dcf6ab7a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ведьмак"] 
+Node0x561058d447a0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="можно проиграть"] 
  
-Node0x564dcf6ab520[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Много гринда"] 
+Node0x561058d45420[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="жизнь"] 
  
-Node0x564dcf6ab660[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ассасин крид"] 
+Node0x561058d45380[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ведьмак"] 
  
-Node0x564dcf6ab5c0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хз"] 
+Node0x561058d44520[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Много гринда"] 
  
-Node0x564dcf6ab2a0->Node0x564dcf6ab700
-Node0x564dcf6ab700->Node0x564dcf6ab840
-Node0x564dcf6ab840->Node0x564dcf6ab980
-Node0x564dcf6ab980->Node0x564dcf6abac0
-Node0x564dcf6ab980->Node0x564dcf6aba20
-Node0x564dcf6ab840->Node0x564dcf6ab8e0
-Node0x564dcf6ab700->Node0x564dcf6ab7a0
-Node0x564dcf6ab2a0->Node0x564dcf6ab520
-Node0x564dcf6ab520->Node0x564dcf6ab660
-Node0x564dcf6ab520->Node0x564dcf6ab5c0
+Node0x561058d44660[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Ассасин крид"] 
+ 
+Node0x561058d445c0[shape=rectangle, color="red", width=0.2, style="filled",fillcolor="lightblue", label="Хз"] 
+ 
+Node0x561058d442a0->Node0x561058d44700
+Node0x561058d44700->Node0x561058d44840
+Node0x561058d44840->Node0x561058d44980
+Node0x561058d44980->Node0x561058d44ac0
+Node0x561058d44980->Node0x561058d44a20
+Node0x561058d44840->Node0x561058d448e0
+Node0x561058d44700->Node0x561058d447a0
+Node0x561058d447a0->Node0x561058d45420
+Node0x561058d447a0->Node0x561058d45380
+Node0x561058d442a0->Node0x561058d44520
+Node0x561058d44520->Node0x561058d44660
+Node0x561058d44520->Node0x561058d445c0
 }

@@ -17,7 +17,7 @@ static void   CompareObjects   (Node* main_node, const char* name_1, const char*
 static void   PrintAndSpeak    (const char string[]);
 static void   AddNodeToBase    (Node* node);
 
-#define SPEAK
+// #define SPEAK
 #ifdef SPEAK
     #define PRINT_AND_SPEAK(...) do { \
         char spoken_text[MAX_SPEAK_LENGTH] = ""; \
@@ -379,7 +379,6 @@ static void TellAbout (Node* node, stack* stk)
         if (node->left && node->right)
         {
             printf (", \n");
-            TellAbout (node, stk);
         }
     }
 
@@ -390,7 +389,6 @@ static void PrintAndSpeak (const char string[])
     assert (string);
 
     printf ("%s", string);
-    ClearBuffer ();
 
     char spoken_text[MAX_SPEAK_LENGTH] = "";
     sprintf (spoken_text, "echo \"%s\" | festival --tts --language russian", string);

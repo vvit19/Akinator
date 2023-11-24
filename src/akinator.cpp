@@ -100,7 +100,8 @@ static void StartGame (const char* base)
                     "Выбери режим: \n"
                     "1) o - отгадывание \n"
                     "2) р - расскажу о предмете из базы \n"
-                    "3) с - сравню 2 предмета из базы \n");
+                    "3) с - сравню 2 предмета из базы \n"
+                    "4) п - показать базу \n");
 
     char mode[3] = "";
     scanf ("%s", mode);
@@ -131,6 +132,10 @@ static void StartGame (const char* base)
 
         if (strcmp (name_1, name_2) == 0) PRINT_AND_SPEAK ("Они одинаковые\n");
         else CompareObjects (main_node, name_1, name_2);
+    }
+    else if (strcmp (mode, "п") == 0)
+    {
+        system ("code tree.png");
     }
     else
     {

@@ -23,7 +23,7 @@ static void   PrintAndSpeak   (const char string[]);
         sprintf (spoken_text, __VA_ARGS__); \
         PrintAndSpeak (spoken_text); } while (0)
 #else
-    #define PRINT_AND_SPEAK(...) printf (__VA_ARGS__);
+    #define PRINT_AND_SPEAK(...) printf (__VA_ARGS__)
 #endif
 
 const int MAX_SPEAK_LENGTH  = 1024;
@@ -102,16 +102,16 @@ static void StartGame (const char* base)
                     "2) р - расскажу о предмете из базы \n"
                     "3) с - сравню 2 предмета из базы \n");
 
-    char ch[3] = "";
-    scanf ("%s", ch);
+    char mode[3] = "";
+    scanf ("%s", mode);
     ClearBuffer ();
 
-    if (strcmp (ch, "о") == 0)
+    if (strcmp (mode, "о") == 0)
     {
         PRINT_AND_SPEAK ("Если ответ на вопрос да - введите \"да\", если ответ нет - введите \"нет\"\n");
         LaunchGuessMode (main_node);
     }
-    else if (strcmp (ch, "р") == 0)
+    else if (strcmp (mode, "р") == 0)
     {
         PRINT_AND_SPEAK ("Введите название предмета: ");
         char name[MAX_NAME_LENGTH] = "";
@@ -119,7 +119,7 @@ static void StartGame (const char* base)
 
         DescribeObject (main_node, name);
     }
-    else if (strcmp (ch, "с") == 0)
+    else if (strcmp (mode, "с") == 0)
     {
         PRINT_AND_SPEAK ("Введите название первого предмета: ");
         char name_1[MAX_NAME_LENGTH] = "";
@@ -140,7 +140,7 @@ static void StartGame (const char* base)
     TreeDump (main_node);
 
     FILE* file = fopen (base, "w");
-    PrintTree (main_node, file);
+    PrintTree (main_node, file, 0);
     fclose (file);
 
     TreeDtor (main_node);

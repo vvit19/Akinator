@@ -23,6 +23,6 @@ struct Node
 Node* CreateNode (Node* parent, Way mode);
 void  TreeDtor   (Node* node);
 void  TreeDump   (Node* node);
-void  PrintTree  (Node* node, FILE* file);
+void  PrintTree  (Node* node, FILE* file, int level);
 
 #endif

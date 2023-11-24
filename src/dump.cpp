@@ -2,6 +2,7 @@
 
 static void NodeDump        (FILE* dot, Node* node);
 static void DrawConnections (FILE* dot, Node* node);
+static void PrintTabs       (FILE* file, int level);
 
 const char* const dot_file = "dump.dot";
 
@@ -59,14 +60,26 @@ static void DrawConnections (FILE* dot, Node* node)
 
 #define $print(...) fprintf (file, __VA_ARGS__)
 
-void PrintTree (Node* node, FILE* file)
+void PrintTree (Node* node, FILE* file, int level)
 {
     assert (file);
 
-    $print("(\n" "%s\n", node->name);
+    PrintTabs (file, level);
+    $print ("(\n");
 
-    if (node->right) PrintTree (node->right, file);
-    if (node->left ) PrintTree (node->left,  file);
+    PrintTabs (file, level);
+    $print("%s\n", node->name);
 
+    if (node->right) PrintTree (node->right, file, level + 1);
+    if (node->left ) PrintTree (node->left,  file, level + 1);
+
+    PrintTabs (file, level);
     $print (")\n");
+}
+
+static void PrintTabs (FILE* file, int level)
+{
+    assert (file);
+
+    for (int i = 0; i < level; i++) $print ("\t");
 }
